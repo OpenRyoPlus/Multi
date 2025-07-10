@@ -4,6 +4,10 @@ import FlashAnzan from '../components/FlashAnzan';
 export default function Home() {
   const [startTrigger, setStartTrigger] = useState(false);
   const [numThreads, setNumThreads] = useState(2); // デフォルトは2スレッド
+  const [numDigits, setNumDigits] = useState(2); // デフォルトは2桁
+  const [displayCount, setDisplayCount] = useState(5); // デフォルトは5回表示
+  const [displayInterval, setDisplayInterval] = useState(1000); // デフォルトは1000ms (1秒)
+  const [userAnswers, setUserAnswers] = useState(['', '', '', '']); // ユーザーの回答を保存
 
   const handleStartAll = () => {
     setStartTrigger(true);
@@ -19,7 +23,7 @@ export default function Home() {
     const anzans = [];
     for (let i = 0; i < numThreads; i++) {
       anzans.push(
-        <FlashAnzan key={i} startTrigger={startTrigger} />
+        <FlashAnzan key={i} startTrigger={startTrigger} numDigits={numDigits} displayCount={displayCount} displayInterval={displayInterval} />
       );
     }
 
@@ -76,8 +80,68 @@ export default function Home() {
               </button>
             ))}
           </div>
+
+          {/* 桁数設定 */}
+          <h2 className="text-xl font-bold text-gray-400 mb-4 mt-4">桁数</h2>
+          <div className="flex space-x-2">
+            {[1, 2, 3, 4].map((count) => (
+              <button
+                key={count}
+                onClick={() => setNumDigits(count)}
+                className={`w-12 h-12 flex items-center justify-center border-2 rounded-md text-lg font-bold
+                  ${numDigits === count ? 'border-purple-500 bg-purple-700' : 'border-gray-600 bg-gray-700 hover:bg-gray-600'}`}
+              >
+                {count}
+              </button>
+            ))}
+          </div>
+
+          {/* 表示数設定 */}
+          <div className="flex items-center mb-4 mt-4">
+            <h2 className="text-xl font-bold text-gray-400 mr-4">表示数</h2>
+            <input
+              type="text"
+              value={displayCount}
+              onChange={(e) => setDisplayCount(parseInt(e.target.value) || 1)}
+              className="w-24 p-2 text-center bg-gray-700 border border-gray-600 rounded-md text-lg font-bold"
+            />
+          </div>
+
+          {/* 表示間隔設定 */}
+          <div className="flex items-center mb-4 mt-4">
+            <h2 className="text-xl font-bold text-gray-400 mr-4">表示間隔 (ms)</h2>
+            <input
+              type="number"
+              min="100"
+              value={displayInterval}
+              onChange={(e) => setDisplayInterval(parseInt(e.target.value) || 100)}
+              className="w-24 p-2 text-center bg-gray-700 border border-gray-600 rounded-md text-lg font-bold"
+            />
+          </div>
+
+          
+          {/* 回答入力欄 */}
+          <h2 className="text-xl font-bold text-gray-400 mb-4 mt-4">回答</h2>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            {[0, 1, 2, 3].map((index) => (
+              <input
+                key={index}
+                type="text"
+                value={userAnswers[index]}
+                onChange={(e) => {
+                  const newAnswers = [...userAnswers];
+                  newAnswers[index] = e.target.value;
+                  setUserAnswers(newAnswers);
+                }}
+                className="p-2 text-center bg-gray-700 border border-gray-600 rounded-md text-lg font-bold"
+                placeholder={`回答 ${index + 1}`}
+              />
+            ))}
+          </div>
           {/* 他の設定項目をここに追加 */}
         </div>
+
+        
 
         {/* STARTボタン */}
         <button

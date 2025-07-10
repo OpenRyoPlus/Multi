@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const FlashAnzan = ({ startTrigger }) => {
+const FlashAnzan = ({ startTrigger, numDigits, displayCount, displayInterval }) => {
   const [number, setNumber] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [numbers, setNumbers] = useState([]);
@@ -8,8 +8,11 @@ const FlashAnzan = ({ startTrigger }) => {
 
   const generateNumbers = () => {
     const newNumbers = [];
-    for (let i = 0; i < 5; i++) { // 5 numbers for now
-      const num = Math.floor(Math.random() * 90) + 10; // 10-99
+    const min = numDigits === 1 ? 0 : Math.pow(10, numDigits - 1);
+    const max = Math.pow(10, numDigits) - 1;
+
+    for (let i = 0; i < displayCount; i++) {
+      const num = Math.floor(Math.random() * (max - min + 1)) + min;
       newNumbers.push(num);
     }
     setNumbers(newNumbers);
@@ -30,7 +33,7 @@ const FlashAnzan = ({ startTrigger }) => {
       timer = setTimeout(() => {
         setNumber(numbers[currentIndex]);
         setCurrentIndex(prev => prev + 1);
-      }, 1000); // Display each number for 1 second
+      }, displayInterval); // Display each number for displayInterval
     } else if (isRunning && currentIndex === numbers.length) {
       timer = setTimeout(() => {
         setNumber(''); // Clear number after sequence
