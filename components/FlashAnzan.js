@@ -42,7 +42,7 @@ const FlashAnzan = ({ startTrigger }) => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full font-mono"> {/* 幅やマージンを制限するスタイルを削除 */}
-      <div className="text-9xl font-bold flex items-center justify-center text-green-400"> {/* 数字を大きく表示 */} 
+      <div className="text-6xl font-bold flex items-center justify-center text-green-400"> {/* 数字を大きく表示 */} 
         {number}
       </div>
     </div>

@@ -25,8 +25,14 @@ export default function Home() {
 
     if (numThreads === 4) {
       return (
-        <div className="grid grid-cols-2 grid-rows-2 w-full h-full gap-2">
-          {anzans}
+        <div className="relative w-full h-full">
+          <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
+            {anzans}
+          </div>
+          {/* Horizontal line */}
+          <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-600 -translate-y-1/2"></div>
+          {/* Vertical line */}
+          <div className="absolute left-1/2 top-0 h-full w-1 bg-gray-600 -translate-x-1/2"></div>
         </div>
       );
     } else {
@@ -83,7 +89,7 @@ export default function Home() {
       </div>
 
       {/* 右側のメインコンテンツエリア */}
-      <div className="flex-1 flex flex-col"> {/* h-screenを削除 */}
+      <div className="flex-1 flex flex-col h-screen"> {/* h-screenを追加 */}
         {renderFlashAnzans()}
       </div>
     </div>
