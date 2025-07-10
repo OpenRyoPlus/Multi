@@ -8,11 +8,22 @@ export default function Home() {
   const [displayCount, setDisplayCount] = useState(5); // デフォルトは5回表示
   const [displayInterval, setDisplayInterval] = useState(1000); // デフォルトは1000ms (1秒)
   const [userAnswers, setUserAnswers] = useState(['', '', '', '']); // ユーザーの回答を保存
+  const [countdown, setCountdown] = useState(null); // カウントダウンの数字
 
   const handleStartAll = () => {
-    setStartTrigger(true);
-    // Reset trigger after a short delay to allow re-triggering
-    setTimeout(() => setStartTrigger(false), 100);
+    setCountdown(3);
+    let count = 3;
+    const countdownTimer = setInterval(() => {
+      count -= 1;
+      if (count > 0) {
+        setCountdown(count);
+      } else {
+        clearInterval(countdownTimer);
+        setCountdown(null); // カウントダウン終了
+        setStartTrigger(true);
+        setTimeout(() => setStartTrigger(false), 100); // フラッシュ暗算開始トリガー
+      }
+    }, 1000);
   };
 
   const handleThreadChange = (count) => {
@@ -23,7 +34,7 @@ export default function Home() {
     const anzans = [];
     for (let i = 0; i < numThreads; i++) {
       anzans.push(
-        <FlashAnzan key={i} startTrigger={startTrigger} numDigits={numDigits} displayCount={displayCount} displayInterval={displayInterval} />
+        <FlashAnzan key={i} startTrigger={startTrigger} numDigits={numDigits} displayCount={displayCount} displayInterval={displayInterval} countdown={countdown} />
       );
     }
 
@@ -109,12 +120,18 @@ export default function Home() {
 
           {/* 表示間隔設定 */}
           <div className="flex items-center mb-4 mt-4">
-            <h2 className="text-xl font-bold text-gray-400 mr-4">表示間隔 (ms)</h2>
+            <h2 className="text-xl font-bold text-gray-400 mr-4">秒数 (1~15)</h2>
             <input
-              type="number"
-              min="100"
-              value={displayInterval}
-              onChange={(e) => setDisplayInterval(parseInt(e.target.value) || 100)}
+              type="text"
+              value={displayInterval / 1000} // ミリ秒を秒に変換して表示
+              onChange={(e) => {
+                const seconds = parseInt(e.target.value);
+                if (!isNaN(seconds) && seconds >= 1 && seconds <= 15) {
+                  setDisplayInterval(seconds * 1000);
+                } else if (e.target.value === '') { // 入力欄が空の場合
+                  setDisplayInterval(0); // または適切な初期値
+                }
+              }}
               className="w-24 p-2 text-center bg-gray-700 border border-gray-600 rounded-md text-lg font-bold"
             />
           </div>
