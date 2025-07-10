@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import FlashAnzan from '../components/FlashAnzan';
+import Head from 'next/head';
+
 
 export default function Home() {
   const [startTrigger, setStartTrigger] = useState(false);
@@ -109,6 +111,15 @@ export default function Home() {
   };
 
   return (
+    <>
+    <Head>
+        <title>マルチスレッドフラッシュ暗算</title>
+        <meta name="description" content="複数の数字列を同時に処理する新感覚フラッシュ暗算。あなたの脳は何スレッドまで耐えられるか？" />
+        <meta property="og:title" content="マルチスレッドフラッシュ暗算" />
+        <meta property="og:description" content="次世代の脳トレ体験。マルチスレッドで脳を鍛えろ。" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </Head>
+
     <div className="flex min-h-screen bg-gray-800 text-white">
       {/* 左側のパネル */}
       <div className="w-1/4 bg-black p-8 shadow-lg flex flex-col justify-start items-center">
@@ -242,5 +253,7 @@ export default function Home() {
         {renderFlashAnzans()}
       </div>
     </div>
+  </>
   );
+
 }
