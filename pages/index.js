@@ -8,9 +8,14 @@ export default function Home() {
   const [displayCount, setDisplayCount] = useState(5); // デフォルトは5回表示
   const [displayInterval, setDisplayInterval] = useState(1000); // デフォルトは1000ms (1秒)
   const [userAnswers, setUserAnswers] = useState(['', '', '', '']); // ユーザーの回答を保存
+  const [correctAnswers, setCorrectAnswers] = useState({}); // 正しい回答を保存
+  const [showAnswers, setShowAnswers] = useState(false); // 回答表示のON/OFF
   const [countdown, setCountdown] = useState(null); // カウントダウンの数字
 
   const handleStartAll = () => {
+    setUserAnswers(['', '', '', '']); // 回答をリセット
+    setCorrectAnswers([]); // 正しい回答をリセット
+    setShowAnswers(false); // 回答表示をリセット
     setCountdown(3);
     let count = 3;
     const countdownTimer = setInterval(() => {
@@ -30,11 +35,46 @@ export default function Home() {
     setNumThreads(count);
   };
 
+  const checkAnswers = () => {
+    if (correctAnswers.length === 0) return; // まだ問題が生成されていない場合
+
+    const sortedUserAnswers = userAnswers.filter(answer => answer !== '').map(Number).sort((a, b) => a - b);
+    const sortedCorrectAnswers = [...correctAnswers].sort((a, b) => a - b);
+
+    // 回答の数が一致しない場合は不正解
+    if (sortedUserAnswers.length !== sortedCorrectAnswers.length) {
+      return;
+    }
+
+    // 各要素が一致するか確認
+    let allCorrect = true;
+    for (let i = 0; i < sortedUserAnswers.length; i++) {
+      if (sortedUserAnswers[i] !== sortedCorrectAnswers[i]) {
+        allCorrect = false;
+        break;
+      }
+    }
+
+    // ここで背景色を更新するロジックを実装する
+    // ただし、各入力フィールドの背景色は個別に管理されているため、
+    // この関数で一括で設定するのではなく、各入力フィールドのclassNameで判定する
+  };
+
   const renderFlashAnzans = () => {
     const anzans = [];
     for (let i = 0; i < numThreads; i++) {
       anzans.push(
-        <FlashAnzan key={i} startTrigger={startTrigger} numDigits={numDigits} displayCount={displayCount} displayInterval={displayInterval} countdown={countdown} />
+        <FlashAnzan 
+          key={i} 
+          startTrigger={startTrigger} 
+          numDigits={numDigits} 
+          displayCount={displayCount} 
+          displayInterval={displayInterval} 
+          countdown={countdown}
+          onSumCalculated={(sum) => setCorrectAnswers(prev => ({ ...prev, [i]: sum }))}
+          showAnswers={showAnswers}
+          correctAnswer={correctAnswers[i]}
+        />
       );
     }
 
@@ -149,9 +189,29 @@ export default function Home() {
                   const newAnswers = [...userAnswers];
                   newAnswers[index] = e.target.value;
                   setUserAnswers(newAnswers);
+
+                  // 正誤判定ロジック
+                  if (correctAnswers.length > 0) { // 正しい回答が生成されている場合のみ判定
+                    const sortedUserAnswers = newAnswers.filter(answer => answer !== '').map(Number).sort((a, b) => a - b);
+                    const sortedCorrectAnswers = [...correctAnswers].sort((a, b) => a - b);
+
+                    // 回答の数が一致しない場合は不正解
+                    if (sortedUserAnswers.length === sortedCorrectAnswers.length) {
+                      let allCorrect = true;
+                      for (let i = 0; i < sortedUserAnswers.length; i++) {
+                        if (sortedUserAnswers[i] !== sortedCorrectAnswers[i]) {
+                          allCorrect = false;
+                          break;
+                        }
+                      }
+                      // ここで各入力フィールドの背景色を更新する
+                      // ただし、各入力フィールドの背景色は個別に管理されているため、
+                      // この関数で一括で設定するのではなく、各入力フィールドのclassNameで判定する
+                    }
+                  }
                 }}
                 className="p-2 text-center bg-gray-700 border border-gray-600 rounded-md text-lg font-bold"
-                placeholder={`回答 ${index + 1}`}
+                placeholder=""
               />
             ))}
           </div>
@@ -161,12 +221,20 @@ export default function Home() {
         
 
         {/* STARTボタン */}
-        <button
-          onClick={handleStartAll}
-          className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-8 rounded-lg text-xl transition duration-300 ease-in-out transform hover:scale-105 shadow-lg shadow-purple-500/50 mt-auto mb-8" 
-        >
-          START
-        </button>
+        <div className="flex space-x-4 mt-auto mb-8">
+          <button
+            onClick={handleStartAll}
+            className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-8 rounded-lg text-xl transition duration-300 ease-in-out transform hover:scale-105 shadow-lg shadow-purple-500/50" 
+          >
+            START
+          </button>
+          <button
+            onClick={() => setShowAnswers(prev => !prev)}
+            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg text-xl transition duration-300 ease-in-out transform hover:scale-105 shadow-lg shadow-blue-500/50" 
+          >
+            ANSWER
+          </button>
+        </div>
       </div>
 
       {/* 右側のメインコンテンツエリア */}
